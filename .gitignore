@@ -1,0 +1,21 @@
+# NetBeans-specific
+/nbproject/private/
+/nbproject/Makefile-*
+/nbproject/configs/
+build/
+dist/
+
+# Java build files
+*.class
+*.jar
+*.war
+*.ear
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+*.DS_Store
+
