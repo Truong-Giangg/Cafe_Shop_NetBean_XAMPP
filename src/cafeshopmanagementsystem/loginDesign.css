@@ -9,7 +9,7 @@ and open the template in the editor.
 */
 
 .gradient{
-    -fx-background-color: linear-gradient(to bottom right, #0f6789, #286155);
+    -fx-background-color: linear-gradient(to bottom right, #ed0e4a, #946d23);
 }
 
 .white-form{
@@ -23,7 +23,7 @@ and open the template in the editor.
 }
 
 .login-btn{
-    -fx-background-color: linear-gradient(to bottom right, #098c53, #246861); 
+    -fx-background-color: linear-gradient(to bottom right, #ed0e4a, #946d23); 
     -fx-background-radius: 5px;
     -fx-cursor: hand;
     -fx-text-fill: #fff;

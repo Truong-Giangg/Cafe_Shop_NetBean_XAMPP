@@ -22,6 +22,7 @@ import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 
 /**
  *
@@ -31,7 +32,7 @@ public class cardProductController implements Initializable {
 
     @FXML
     private AnchorPane card_form;
-
+    
     @FXML
     private Label prod_name;
 
@@ -71,9 +72,9 @@ public class cardProductController implements Initializable {
         type = prodData.getType();
         prodID = prodData.getProductId();
         prod_name.setText(prodData.getProductName());
-        prod_price.setText("$" + String.valueOf(prodData.getPrice()));
+        prod_price.setText(String.valueOf(prodData.getPrice())+ "đ");
         String path = "File:" + prodData.getImage();
-        image = new Image(path, 190, 94, false, true);
+        image = new Image(path, 190, 190, false, true);
         prod_imageView.setImage(image);
         pr = prodData.getPrice();
 
@@ -137,7 +138,7 @@ public class cardProductController implements Initializable {
                 alert = new Alert(AlertType.ERROR);
                 alert.setTitle("Error Message");
                 alert.setHeaderText(null);
-                alert.setContentText("Something Wrong :3");
+                alert.setContentText("Something Wrong");
                 alert.showAndWait();
             } else {
 
@@ -197,7 +198,9 @@ public class cardProductController implements Initializable {
                     alert.setContentText("Successfully Added!");
                     alert.showAndWait();
                     
-                    mForm.menuGetTotal();
+                    //todo refresh cart
+
+                    mForm.menuGetTotal();                  
                 }
             }
         } catch (Exception e) {

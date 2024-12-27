@@ -54,6 +54,9 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import net.sf.jasperreports.view.JasperViewer;
+import javafx.scene.control.Dialog;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 
 /**
  *
@@ -78,6 +81,9 @@ public class mainFormController implements Initializable {
     
     @FXML
     private Button customers_btn;
+    
+    @FXML
+    private Button branches_btn;
     
     @FXML
     private Button logout_btn;
@@ -149,10 +155,16 @@ public class mainFormController implements Initializable {
     private AnchorPane menu_form;
     
     @FXML
+    private AnchorPane branch_form;
+    
+    @FXML
     private ScrollPane menu_scrollPane;
     
     @FXML
     private GridPane menu_gridPane;
+    
+    @FXML
+    private GridPane branch_gridPane;
     
     @FXML
     private TableView<productData> menu_tableView;
@@ -168,12 +180,6 @@ public class mainFormController implements Initializable {
     
     @FXML
     private Label menu_total;
-    
-    @FXML
-    private TextField menu_amount;
-    
-    @FXML
-    private Label menu_change;
     
     @FXML
     private Button menu_payBtn;
@@ -272,7 +278,7 @@ public class mainFormController implements Initializable {
                 ti = result.getDouble("SUM(total)");
             }
             
-            dashboard_TI.setText("$" + ti);
+            dashboard_TI.setText(ti + "đ");
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -292,7 +298,7 @@ public class mainFormController implements Initializable {
             if (result.next()) {
                 ti = result.getFloat("SUM(total)");
             }
-            dashboard_TotalI.setText("$" + ti);
+            dashboard_TotalI.setText(ti + "đ");
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -428,7 +434,7 @@ public class mainFormController implements Initializable {
                     alert.setHeaderText(null);
                     alert.setContentText("Successfully Added!");
                     alert.showAndWait();
-                    
+                                      
                     inventoryShowData();
                     inventoryClearBtn();
                 }
@@ -761,6 +767,40 @@ public class mainFormController implements Initializable {
             }
         }
     }
+        
+    public void branchDisplayCard() {
+        
+        cardListData.clear();
+        cardListData.addAll(menuGetData());
+        
+        int row = 0;
+        int column = 0;
+        
+        branch_gridPane.getChildren().clear();
+        branch_gridPane.getRowConstraints().clear();
+        branch_gridPane.getColumnConstraints().clear();
+
+        try {
+                FXMLLoader load = new FXMLLoader();
+                load.setLocation(getClass().getResource("shopChain.fxml"));
+                AnchorPane pane = load.load();
+                CafeShopController cardC = load.getController();
+//                cardC.setData(cardListData.get(q));
+                
+//                if (column == 3) {
+//                    column = 0;
+//                    row += 1;
+//                }
+//                
+                branch_gridPane.add(pane, column, row);
+                
+//                
+//                GridPane.setMargin(pane, new Insets(10));
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+    }
     
     public ObservableList<productData> menuGetOrder() {
         customerID();
@@ -846,31 +886,9 @@ public class mainFormController implements Initializable {
     
     public void menuDisplayTotal() {
         menuGetTotal();
-        menu_total.setText("$" + totalP);
+        menu_total.setText(totalP + "đ");
     }
-    
-    private double amount;
-    private double change;
-    
-    public void menuAmount() {
-        menuGetTotal();
-        if (menu_amount.getText().isEmpty() || totalP == 0) {
-            alert = new Alert(AlertType.ERROR);
-            alert.setTitle("Error Message");
-            alert.setHeaderText(null);
-            alert.setContentText("Invalid :3");
-            alert.showAndWait();
-        } else {
-            amount = Double.parseDouble(menu_amount.getText());
-            if (amount < totalP) {
-                menu_amount.setText("");
-            } else {
-                change = (amount - totalP);
-                menu_change.setText("$" + change);
-            }
-        }
-    }
-    
+        
     public void menuPayBtn() {
         
         if (totalP == 0) {
@@ -888,49 +906,43 @@ public class mainFormController implements Initializable {
             
             try {
                 
-                if (amount == 0) {
-                    alert = new Alert(AlertType.ERROR);
-                    alert.setTitle("Error Messaged");
+                alert = new Alert(AlertType.CONFIRMATION);
+                alert.setTitle("Confirmation Message");
+                alert.setHeaderText(null);
+                alert.setContentText("Are you sure?");
+                Optional<ButtonType> option = alert.showAndWait();
+                int rating = showShopReviewPopup();
+                System.out.println("User's Rating: " + rating);
+
+                if (option.get().equals(ButtonType.OK)) {
+                    customerID();
+                    menuGetTotal();
+                    prepare = connect.prepareStatement(insertPay);
+                    prepare.setString(1, String.valueOf(cID));
+                    prepare.setString(2, String.valueOf(totalP));
+
+                    Date date = new Date();
+                    java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+
+                    prepare.setString(3, String.valueOf(sqlDate));
+                    prepare.setString(4, data.username);
+
+                    prepare.executeUpdate();
+
+                    alert = new Alert(AlertType.INFORMATION);
+                    alert.setTitle("Infomation Message");
                     alert.setHeaderText(null);
-                    alert.setContentText("Something wrong :3");
+                    alert.setContentText("Successful.");
                     alert.showAndWait();
+
+                    menuShowOrderData();
+
                 } else {
-                    alert = new Alert(AlertType.CONFIRMATION);
-                    alert.setTitle("Confirmation Message");
+                    alert = new Alert(AlertType.WARNING);
+                    alert.setTitle("Infomation Message");
                     alert.setHeaderText(null);
-                    alert.setContentText("Are you sure?");
-                    Optional<ButtonType> option = alert.showAndWait();
-                    
-                    if (option.get().equals(ButtonType.OK)) {
-                        customerID();
-                        menuGetTotal();
-                        prepare = connect.prepareStatement(insertPay);
-                        prepare.setString(1, String.valueOf(cID));
-                        prepare.setString(2, String.valueOf(totalP));
-                        
-                        Date date = new Date();
-                        java.sql.Date sqlDate = new java.sql.Date(date.getTime());
-                        
-                        prepare.setString(3, String.valueOf(sqlDate));
-                        prepare.setString(4, data.username);
-                        
-                        prepare.executeUpdate();
-                        
-                        alert = new Alert(AlertType.INFORMATION);
-                        alert.setTitle("Infomation Message");
-                        alert.setHeaderText(null);
-                        alert.setContentText("Successful.");
-                        alert.showAndWait();
-                        
-                        menuShowOrderData();
-                        
-                    } else {
-                        alert = new Alert(AlertType.WARNING);
-                        alert.setTitle("Infomation Message");
-                        alert.setHeaderText(null);
-                        alert.setContentText("Cancelled.");
-                        alert.showAndWait();
-                    }
+                    alert.setContentText("Cancelled.");
+                    alert.showAndWait();
                 }
                 
             } catch (Exception e) {
@@ -971,9 +983,8 @@ public class mainFormController implements Initializable {
         }
     }
     
-    public void menuReceiptBtn() {
-        
-        if (totalP == 0 || menu_amount.getText().isEmpty()) {
+    public void menuReceiptBtn() {        
+        if (totalP == 0 ) {
             alert = new Alert(AlertType.ERROR);
             alert.setTitle("Error Message");
             alert.setContentText("Please order first");
@@ -984,7 +995,7 @@ public class mainFormController implements Initializable {
             
             try {
                 
-                JasperDesign jDesign = JRXmlLoader.load("C:\\Users\\WINDOWS 10\\Documents\\NetBeansProjects\\cafeShopManagementSystem\\src\\cafeshopmanagementsystem\\report.jrxml");
+                JasperDesign jDesign = JRXmlLoader.load("C:\\Users\\phamv\\Downloads\\CafeShopManagementSystem-main\\cafeShopManagementSystem\\src\\cafeshopmanagementsystem\\report.jrxml");
                 JasperReport jReport = JasperCompileManager.compileReport(jDesign);
                 JasperPrint jPrint = JasperFillManager.fillReport(jReport, map, connect);
                 
@@ -1002,11 +1013,7 @@ public class mainFormController implements Initializable {
     
     public void menuRestart() {
         totalP = 0;
-        change = 0;
-        amount = 0;
-        menu_total.setText("$0.0");
-        menu_amount.setText("");
-        menu_change.setText("$0.0");
+        menu_total.setText("0đ");
     }
     
     private int cID;
@@ -1093,6 +1100,7 @@ public class mainFormController implements Initializable {
             inventory_form.setVisible(false);
             menu_form.setVisible(false);
             customers_form.setVisible(false);
+            branch_form.setVisible(false);
             
             dashboardDisplayNC();
             dashboardDisplayTI();
@@ -1106,6 +1114,7 @@ public class mainFormController implements Initializable {
             inventory_form.setVisible(true);
             menu_form.setVisible(false);
             customers_form.setVisible(false);
+            branch_form.setVisible(false);
             
             inventoryTypeList();
             inventoryStatusList();
@@ -1115,6 +1124,7 @@ public class mainFormController implements Initializable {
             inventory_form.setVisible(false);
             menu_form.setVisible(true);
             customers_form.setVisible(false);
+            branch_form.setVisible(false);
             
             menuDisplayCard();
             menuDisplayTotal();
@@ -1124,9 +1134,18 @@ public class mainFormController implements Initializable {
             inventory_form.setVisible(false);
             menu_form.setVisible(false);
             customers_form.setVisible(true);
+            branch_form.setVisible(false);
             
             customersShowData();
-        }
+        } else if (event.getSource() == branches_btn) {
+            dashboard_form.setVisible(false);
+            inventory_form.setVisible(false);
+            branch_form.setVisible(true);
+            customers_form.setVisible(false);
+            menu_form.setVisible(false);
+            
+            branchDisplayCard();
+        } 
         
     }
 // LETS PROCEED TO OUR DASHBOARD FORM : )
@@ -1152,7 +1171,7 @@ public class mainFormController implements Initializable {
                 Stage stage = new Stage();
                 Scene scene = new Scene(root);
                 
-                stage.setTitle("Cafe Shop Management System");
+                stage.setTitle("Sai gon Cafe");
                 
                 stage.setScene(scene);
                 stage.show();
@@ -1191,17 +1210,48 @@ public class mainFormController implements Initializable {
         inventoryShowData();
         
         menuDisplayCard();
+        branchDisplayCard();
         menuGetOrder();
         menuDisplayTotal();
         menuShowOrderData();
         
         customersShowData();
+
+    }
+
+    private int showShopReviewPopup() {
+        Dialog<Integer> dialog = new Dialog<>();
+        dialog.setTitle("Shop Review");
         
+        VBox content = new VBox();
+        Label label = new Label("Rate the Shop (1 to 5 stars):");
+        HBox starBox = new HBox();
+        starBox.setSpacing(10);
+        starBox.setStyle("-fx-alignment: center;");
+
+        // Create star buttons
+        int[] rating = {0}; // Array to hold rating
+        for (int i = 1; i <= 5; i++) {
+            Button starButton = new Button("★");
+            starButton.setStyle("-fx-font-size: 20; -fx-background-color: transparent;");
+            final int starRating = i;
+            starButton.setOnAction(e -> {
+                rating[0] = starRating;
+                dialog.setResult(starRating); // Set dialog result
+                dialog.close(); // Close dialog
+            });
+            starBox.getChildren().add(starButton);
+        }
+
+        content.getChildren().addAll(label, starBox);
+        content.setSpacing(10);
+        content.setStyle("-fx-padding: 20; -fx-alignment: center;");
+
+        dialog.getDialogPane().setContent(content);
+        dialog.setResultConverter(dialogButton -> rating[0]);
+
+        dialog.showAndWait();
+        return rating[0];
     }
     
 }
-
-
-// THATS IT FOR THIS VIDEO, THANKS FOR WATCHING!
-// SUBSCRIBE OUR CHANNEL FOR MORE UNIQUE TUTORIALS 
-// THANK YOU!

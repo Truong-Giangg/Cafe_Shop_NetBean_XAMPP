@@ -159,7 +159,7 @@ public class FXMLDocumentController implements Initializable {
                     Stage stage = new Stage();
                     Scene scene = new Scene(root);
                     
-                    stage.setTitle("Cafe Shop Management System");
+                    stage.setTitle("Sai gon Cafe");
                     stage.setMinWidth(1100);
                     stage.setMinHeight(600);
                     

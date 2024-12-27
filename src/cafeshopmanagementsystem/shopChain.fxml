@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/11.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="cafeshopmanagementsystem.CafeShopController"
+            fx:id="branch_form"
+            layoutX="113.0" layoutY="181.0" prefHeight="600.0" prefWidth="878.0" visible="true"
+            AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    <children>
+        <VBox fx:id="shopList" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0"
+              AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+            <!-- Template for one shop -->
+            <VBox fx:id="shopEntryTemplate" spacing="5.0" style="-fx-padding: 10; -fx-border-color: black; -fx-background-color: lightblue;" visible="false">
+                <children>
+                    <Label fx:id="shopName" text="Shop Name" style="-fx-font-size: 16; -fx-font-weight: bold;" />
+                    <Label fx:id="shopAddress" text="Shop Address" style="-fx-font-size: 14;" />
+                    <HBox fx:id="starBox" spacing="5.0">
+                        <!-- Placeholder for star icons -->
+                    </HBox>
+                    <Label fx:id="voteCount" text="Votes: 0" style="-fx-font-size: 14; -fx-text-fill: darkgrey;" />
+                </children>
+            </VBox>
+        </VBox>
+    </children>
+</AnchorPane>
